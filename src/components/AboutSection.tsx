@@ -49,8 +49,12 @@ export default function AboutSection() {
                     <feature.icon size={20} className="text-white" />
                   </div>
                   <div>
-                    <h4 className="text-white font-semibold mb-1">{feature.title}</h4>
-                    <p className="text-gray-400 text-sm">{feature.description}</p>
+                    <h3 className="text-white font-semibold mb-1 text-base">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      {feature.description}
+                    </p>
                   </div>
                 </div>
               ))}

@@ -55,14 +55,14 @@ export default function PartnersSection() {
               className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
             >
               <div className="flex flex-col items-center text-center space-y-4">
-                <div className="p-4 bg-[#22c55e] rounded-full">
+                <div className="p-4 bg-green-700 rounded-full">
                   <partner.icon className="w-10 h-10 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
                     {partner.name}
                   </h3>
-                  <span className="inline-block px-3 py-1 bg-[#22c55e] text-white text-sm rounded-full mb-3">
+                  <span className="inline-block px-3 py-1 bg-green-700 text-white text-sm rounded-full mb-3">
                     {partner.tier}
                   </span>
                   <p className="text-gray-600 text-sm leading-relaxed mb-4">

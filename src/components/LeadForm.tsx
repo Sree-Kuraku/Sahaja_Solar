@@ -210,14 +210,21 @@ export default function LeadForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-[#22c55e] text-white font-bold rounded-lg hover:bg-[#1ea34d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-green-700 text-white font-bold rounded-lg
+                        hover:bg-green-800 transition-colors
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                        flex items-center justify-center space-x-2"
             >
               {loading ? (
-                <span>Submitting...</span>
+                <span className="text-white text-base font-semibold">
+                  Submitting...
+                </span>
               ) : (
                 <>
-                  <span>Get Free Quote</span>
-                  <Send size={20} />
+                  <span className="text-white text-base font-semibold">
+                    Get Free Quote
+                  </span>
+                  <Send size={20} className="text-white" />
                 </>
               )}
             </button>
