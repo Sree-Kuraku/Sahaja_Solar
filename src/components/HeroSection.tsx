@@ -1,6 +1,6 @@
 export default function HeroSection() {
   return (
-    <section id="home" className="min-h-screen flex items-center pt-16">
+    <section id="home" className="md:min-h-screen flex items-center pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
@@ -16,11 +16,12 @@ export default function HeroSection() {
 
           <div className="flex justify-center md:justify-end">
             <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-12 shadow-2xl w-full max-w-md">
-              <h2 className="text-5xl md:text-6xl font-bold text-center">
-                <span className="text-white">SAHAJA</span>
-                <br />
-                <span className="text-[#22c55e]">SOLAR</span>
-              </h2>
+             <div className="h-[300px] flex items-center">
+               <img src="brandLogo.png"
+                alt="Brand Logo"
+                className="max-w-full max-h-full mx-auto mb-6"
+              />
+             </div>
             </div>
           </div>
         </div>

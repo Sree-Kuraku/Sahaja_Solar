@@ -99,7 +99,7 @@ export default function NewRequests({ onRefresh }: NewRequestsProps) {
                     </div>
                     <div className="flex items-center text-white">
                       <Phone size={14} className="mr-2 text-gray-400" />
-                      <span className="text-sm">{request.phone}</span>
+                      <a href={`tel:${request.phone}`} className="text-sm">{request.phone}</a>
                     </div>
                   </td>
                   <td className="py-4 px-4">
