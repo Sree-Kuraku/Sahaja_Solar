@@ -10,17 +10,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface LeadRequest {
-  id?: string;
-  first_name: string;
-  last_name: string;
+  id: number;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   state: string;
   mandal: string;
-  full_address: string;
-  property_type: 'Residential' | 'Commercial';
-  avg_monthly_bill: string;
-  created_at?: string;
+  fullAddress: string;
+  propertyType: string;
+  avgMonthlyBill: number;
+  createdAt: string;
 }
 
 export interface Project {

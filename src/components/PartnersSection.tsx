@@ -2,7 +2,7 @@ import { Sun, Award, CheckCircle, Star } from 'lucide-react';
 
 const partners = [
   {
-    name: 'Waaree Energies',
+    name: 'Waaree ',
     description: 'India\'s largest solar panel manufacturer with 12 GW production capacity. Known for high-efficiency modules and excellent durability.',
     tier: 'Tier-1',
     efficiency: '21.5%',
@@ -18,7 +18,7 @@ const partners = [
     icon: Award
   },
   {
-    name: 'Vikram Solar',
+    name: 'Adhani',
     description: 'Leading Indian solar energy company known for technological innovation and high-performance solar modules.',
     tier: 'Tier-1',
     efficiency: '20.8%',
@@ -26,7 +26,7 @@ const partners = [
     icon: CheckCircle
   },
   {
-    name: 'Goldi Solar',
+    name: 'rayzon',
     description: 'Trusted name in Indian solar industry, providing reliable and cost-effective solar solutions for all segments.',
     tier: 'Tier-1',
     efficiency: '20.5%',
@@ -37,17 +37,9 @@ const partners = [
 
 export default function PartnersSection() {
   return (
-    <section id="partners" className="py-20">
+    <div className="mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Our <span className="text-[#22c55e]">Partner Companies</span>
-          </h2>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            We partner with India's leading Tier-1 solar panel manufacturers to ensure premium quality
-          </p>
-        </div>
-
+       
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {partners.map((partner, index) => (
             <div
@@ -84,6 +76,6 @@ export default function PartnersSection() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

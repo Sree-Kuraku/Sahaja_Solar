@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase, LeadRequest } from '../../lib/supabase';
+import axios from 'axios';
+import { LeadRequest } from '../../lib/supabase';
 import { Search, Mail, Phone, MapPin } from 'lucide-react';
 
 interface NewRequestsProps {
@@ -29,20 +30,30 @@ export default function NewRequests({ onRefresh }: NewRequestsProps) {
   }, [searchTerm, requests]);
 
   const loadRequests = async () => {
+  try {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('lead_requests')
-      .select('*')
-      .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setRequests(data);
-      setFilteredRequests(data);
-    }
-    setLoading(false);
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      "http://localhost:8080/api/leads",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setRequests(response.data);
+    setFilteredRequests(response.data);
+
     onRefresh();
-  };
-
+  } catch (error) {
+    console.error("Error loading requests:", error);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
@@ -82,7 +93,7 @@ export default function NewRequests({ onRefresh }: NewRequestsProps) {
                 <tr key={request.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                   <td className="py-4 px-4">
                     <div className="text-white font-medium">
-                      {request.first_name} {request.last_name}
+                     {request.firstName} {request.lastName}
                     </div>
                     <div className="text-sm text-gray-400">{request.state}</div>
                   </td>
@@ -104,16 +115,16 @@ export default function NewRequests({ onRefresh }: NewRequestsProps) {
                   </td>
                   <td className="py-4 px-4">
                     <span className={`px-3 py-1 rounded-full text-sm ${
-                      request.property_type === 'Residential'
+                      request.propertyType === 'Residential'
                         ? 'bg-blue-500/20 text-blue-300'
                         : 'bg-purple-500/20 text-purple-300'
                     }`}>
-                      {request.property_type}
+                      {request.propertyType}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-white">{request.avg_monthly_bill}</td>
+                  <td className="py-4 px-4 text-white">{request.avgMonthlyBill}</td>
                   <td className="py-4 px-4 text-gray-400 text-sm">
-                    {new Date(request.created_at!).toLocaleDateString()}
+                    {new Date(request.createdAt!).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

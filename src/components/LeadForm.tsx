@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
-import { supabase } from '../lib/supabase';
+import axios from 'axios';
 import { Send, CheckCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -14,53 +15,120 @@ const indianStates = [
 
 export default function LeadForm() {
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    state: '',
-    mandal: '',
-    full_address: '',
-    property_type: 'Residential' as 'Residential' | 'Commercial',
-    avg_monthly_bill: ''
-  });
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  state: '',
+  mandal: '',
+  fullAddress: '',
+  propertyType: 'Residential' as 'Residential' | 'Commercial',
+  avgMonthlyBill: ''
+});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  console.log("Submit button clicked");
+  e.preventDefault();
 
-    try {
-      const { error: submitError } = await supabase
-        .from('lead_requests')
-        .insert([formData]);
+  setLoading(true);
+  setError('');
 
-      if (submitError) throw submitError;
+  let backendSuccess = false;
+  let emailSuccess = false;
 
-      setSuccess(true);
-      setFormData({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        state: '',
-        mandal: '',
-        full_address: '',
-        property_type: 'Residential',
-        avg_monthly_bill: ''
-      });
+  // =========================
+  // 1. SEND TO BACKEND
+  // =========================
+  try {
+    console.log("Sending Data to Backend:", formData);
 
-      setTimeout(() => setSuccess(false), 5000);
-    } catch (err) {
-      setError('Failed to submit form. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    await axios.post(
+      "http://localhost:8080/api/leads",
+      formData
+    );
+
+    backendSuccess = true;
+    console.log("Backend: Success");
+
+  } catch (backendError) {
+    console.error("Backend failed:", backendError);
+  }
+
+
+  // =========================
+  // 2. SEND EMAIL THROUGH EMAILJS
+  // =========================
+  try {
+    console.log("Sending Email:", formData);
+
+    await emailjs.send(
+      "service_k3s2q64",
+      "template_6bdwrig",
+      {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        state: formData.state,
+        mandal: formData.mandal,
+
+        // Your Capacity field is stored
+        // in fullAddress
+        capacity: formData.fullAddress,
+
+        property_type: formData.propertyType,
+        avg_monthly_bill: formData.avgMonthlyBill,
+      },
+      "chvSKHFLd0CNqMQ7u"
+    );
+
+    emailSuccess = true;
+    console.log("EmailJS: Success");
+
+  } catch (emailError) {
+    console.error("EmailJS failed:", emailError);
+  }
+
+
+  // =========================
+  // 3. IF EITHER ONE WORKS
+  // =========================
+  if (backendSuccess || emailSuccess) {
+
+    setSuccess(true);
+
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      state: '',
+      mandal: '',
+      fullAddress: '',
+      propertyType: 'Residential',
+      avgMonthlyBill: ''
+    });
+
+    setTimeout(() => {
+      setSuccess(false);
+    }, 5000);
+
+  } else {
+
+    setError(
+      "Unable to submit your enquiry. Please try again."
+    );
+  }
+
+
+  // =========================
+  // 4. STOP LOADING
+  // =========================
+  setLoading(false);
+};
 
   return (
     <section id="contact" className="py-20">
@@ -95,8 +163,8 @@ export default function LeadForm() {
                 <input
                   type="text"
                   required
-                  value={formData.first_name}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
                   placeholder="John"
                 />
@@ -106,8 +174,8 @@ export default function LeadForm() {
                 <input
                   type="text"
                   required
-                  value={formData.last_name}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
                   placeholder="Doe"
                 />
@@ -169,25 +237,30 @@ export default function LeadForm() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-white mb-2 font-medium">Full Address *</label>
-              <textarea
-                required
-                value={formData.full_address}
-                onChange={(e) => setFormData({ ...formData, full_address: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
-                placeholder="Enter complete address"
-              />
-            </div>
+           <div>
+  <label className="block text-white mb-2 font-medium">
+    Capacity *
+  </label>
+
+  <input
+    required
+    type="text"
+    value={formData.fullAddress}
+    onChange={(e) =>
+      setFormData({ ...formData, fullAddress: e.target.value })
+    }
+    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
+    placeholder="Enter your capacity (e.g. 3 kW)"
+  />
+</div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-white mb-2 font-medium">Property Type *</label>
                 <select
                   required
-                  value={formData.property_type}
-                  onChange={(e) => setFormData({ ...formData, property_type: e.target.value as 'Residential' | 'Commercial' })}
+                  value={formData.propertyType}
+                  onChange={(e) => setFormData({ ...formData, propertyType: e.target.value as 'Residential' | 'Commercial' })}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
                 >
                   <option value="Residential" className="bg-[#0f172a]">Residential</option>
@@ -199,8 +272,8 @@ export default function LeadForm() {
                 <input
                   type="text"
                   required
-                  value={formData.avg_monthly_bill}
-                  onChange={(e) => setFormData({ ...formData, avg_monthly_bill: e.target.value })}
+                  value={formData.avgMonthlyBill}
+                  onChange={(e) => setFormData({ ...formData, avgMonthlyBill: e.target.value })}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
                   placeholder="₹5000"
                 />

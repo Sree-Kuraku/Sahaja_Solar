@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
-import { supabase } from '../../lib/supabase';
-import { CheckCircle, Upload } from 'lucide-react';
+import axios from 'axios';
+import { CheckCircle } from 'lucide-react';
 
 interface AddProjectProps {
   onRefresh: () => void;
@@ -10,13 +10,13 @@ const panelTypes = ['Waaree', 'Tata', 'Vikram', 'Goldi'];
 
 export default function AddProject({ onRefresh }: AddProjectProps) {
   const [formData, setFormData] = useState({
-    project_id: '',
-    customer_name: '',
+    projectId: '',
+    customerName: '',
     mandal: '',
-    panel_type: 'Waaree',
+    panelType: 'Waaree',
     capacity: '',
     status: 'Pending' as 'Pending' | 'Surveying' | 'Completed',
-    progress_percentage: '0'
+    progress: '0'
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -28,41 +28,47 @@ export default function AddProject({ onRefresh }: AddProjectProps) {
     setError('');
 
     try {
-      const { error: submitError } = await supabase
-        .from('projects')
-        .insert([{
-          project_id: formData.project_id,
-          customer_name: formData.customer_name,
-          mandal: formData.mandal,
-          panel_type: formData.panel_type,
-          capacity: parseFloat(formData.capacity),
-          status: formData.status,
-          progress_percentage: parseInt(formData.progress_percentage),
-          updated_at: new Date().toISOString()
-        }]);
+      const token = localStorage.getItem("token");
 
-      if (submitError) throw submitError;
+await axios.post(
+    "http://localhost:8080/api/projects",
+    {
+        projectId: formData.projectId,
+        customerName: formData.customerName,
+        mandal: formData.mandal,
+        panelType: formData.panelType,
+        capacity: parseFloat(formData.capacity),
+        status: formData.status,
+        progress: parseInt(formData.progress)
+    },
+    {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+);
 
       setSuccess(true);
       setFormData({
-        project_id: '',
-        customer_name: '',
+        projectId: '',
+        customerName: '',
         mandal: '',
-        panel_type: 'Waaree',
+        panelType: 'Waaree',
         capacity: '',
         status: 'Pending',
-        progress_percentage: '0'
+        progress: '0'
       });
       onRefresh();
 
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Failed to add project. Please try again.');
-      }
-    } finally {
+    } catch (err) {
+    if (axios.isAxiosError(err)) {
+        console.log(err.response);
+        setError(err.response?.data || "Failed to add project.");
+    } else {
+        setError("Something went wrong.");
+    }
+} finally {
       setLoading(false);
     }
   };
@@ -89,8 +95,8 @@ export default function AddProject({ onRefresh }: AddProjectProps) {
             <input
               type="text"
               required
-              value={formData.project_id}
-              onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
+              value={formData.projectId}
+              onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
               placeholder="PRJ-001"
             />
@@ -100,8 +106,8 @@ export default function AddProject({ onRefresh }: AddProjectProps) {
             <input
               type="text"
               required
-              value={formData.customer_name}
-              onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
+              value={formData.customerName}
+              onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
               placeholder="John Doe"
             />
@@ -124,8 +130,8 @@ export default function AddProject({ onRefresh }: AddProjectProps) {
             <label className="block text-white mb-2 font-medium">Panel Type *</label>
             <select
               required
-              value={formData.panel_type}
-              onChange={(e) => setFormData({ ...formData, panel_type: e.target.value })}
+              value={formData.panelType}
+              onChange={(e) => setFormData({ ...formData, panelType: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
             >
               {panelTypes.map((type) => (
@@ -173,19 +179,13 @@ export default function AddProject({ onRefresh }: AddProjectProps) {
               min="0"
               max="100"
               required
-              value={formData.progress_percentage}
-              onChange={(e) => setFormData({ ...formData, progress_percentage: e.target.value })}
+              value={formData.progress}
+              onChange={(e) => setFormData({ ...formData, progress: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e]"
               placeholder="0"
             />
           </div>
-          <div>
-            <label className="block text-white mb-2 font-medium">Upload Document (Optional)</label>
-            <div className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-gray-400 hover:bg-white/15 transition-colors cursor-pointer">
-              <Upload size={20} className="mr-2" />
-              <span>Choose file</span>
-            </div>
-          </div>
+         
         </div>
 
         <button

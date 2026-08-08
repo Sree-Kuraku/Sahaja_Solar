@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
+import axios from "axios";
 import { LogOut, Users, Plus, Activity } from 'lucide-react';
 import NewRequests from './NewRequests';
 import AddProject from './AddProject';
 import ProjectStatus from './ProjectStatus';
+import ProjectGallery from "./ProjectGallery";
 
 export default function AdminDashboard() {
   const { signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState<'requests' | 'add' | 'status'>('requests');
+  const [activeTab, setActiveTab] =
+useState<'requests' | 'add' | 'status' | 'gallery'>('requests');
   const [requestsCount, setRequestsCount] = useState(0);
   const [projectsCount, setProjectsCount] = useState(0);
 
@@ -17,17 +19,36 @@ export default function AdminDashboard() {
   }, []);
 
   const loadStats = async () => {
-    const { count: reqCount } = await supabase
-      .from('lead_requests')
-      .select('*', { count: 'exact', head: true });
+  try {
+    const token = localStorage.getItem("token");
 
-    const { count: projCount } = await supabase
-      .from('projects')
-      .select('*', { count: 'exact', head: true });
+    // Total Lead Requests
+    const leadResponse = await axios.get(
+      "http://localhost:8080/api/leads",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    setRequestsCount(reqCount || 0);
-    setProjectsCount(projCount || 0);
-  };
+    // Total Projects
+    const projectResponse = await axios.get(
+      "http://localhost:8080/api/projects",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setRequestsCount(leadResponse.data.length);
+    setProjectsCount(projectResponse.data.length);
+
+  } catch (error) {
+    console.error("Error loading dashboard stats:", error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#0f172a] pt-20">
@@ -116,12 +137,23 @@ export default function AdminDashboard() {
             >
               Project Status
             </button>
+            <button
+          onClick={() => setActiveTab("gallery")}
+           className={`px-4 py-3 font-medium transition-colors ${
+             activeTab === "gallery"
+             ? "text-[#22c55e] border-b-2 border-[#22c55e]"
+             : "text-gray-400 hover:text-white"
+             }`}
+>
+  Project Gallery
+</button>
           </div>
 
           <div>
             {activeTab === 'requests' && <NewRequests onRefresh={loadStats} />}
             {activeTab === 'add' && <AddProject onRefresh={loadStats} />}
             {activeTab === 'status' && <ProjectStatus />}
+            {activeTab === 'gallery' && <ProjectGallery />}   
           </div>
         </div>
       </div>

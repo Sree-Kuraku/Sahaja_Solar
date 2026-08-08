@@ -6,11 +6,20 @@ import AboutSection from './components/AboutSection';
 import WhySolarSection from './components/WhySolarSection';
 import ServicesSection from './components/ServicesSection';
 import SubsidiesSection from './components/SubsidiesSection';
-import PartnersSection from './components/PartnersSection';
+import Gallery from "./components/Gallery";
+import SolarModules from "./components/SolarModules";
+import SolarStreetLights from "./components/SolarStreetLights";
+import SolarWaterPumps from "./components/SolarWaterPumps";
+import SolarOffGrid from "./components/SolarOffGrid";
+import SolarInverters from "./components/SolarInverters";
+import SolarBatteries from "./components/SolarBatteries";
+import SolarWaterHeaters from "./components/SolarWaterHeaters";
 import LeadForm from './components/LeadForm';
 import Footer from './components/Footer';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
+import WhatsAppButton from "./components/WhatsAppButton";
+
 
 function App() {
   const { user, loading } = useAuth();
@@ -59,9 +68,18 @@ function App() {
         <WhySolarSection />
         <ServicesSection />
         <SubsidiesSection />
-        <PartnersSection />
+         <Gallery />
+        <SolarModules />
+<SolarStreetLights />
+<SolarWaterPumps />
+<SolarOffGrid />
+<SolarInverters />
+<SolarBatteries />
+<SolarWaterHeaters />
         <LeadForm />
         <Footer />
+        <WhatsAppButton />
+        
       </div>
 
       {showAdminLogin && (
