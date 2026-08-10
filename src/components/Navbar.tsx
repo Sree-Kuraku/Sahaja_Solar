@@ -24,6 +24,10 @@ export default function Navbar({
       setIsOpen(false);
     }
   };
+  const handleMobileContactClick = () => {
+  setIsOpen(false);
+  onContactClick();
+};
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 border-b border-white/20">
@@ -213,9 +217,9 @@ export default function Navbar({
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden backdrop-blur-md bg-[#0f172a]/95 border-t border-white/20">
+  <div className="md:hidden backdrop-blur-md bg-[#0f172a]/95 border-t border-white/20 max-h-[calc(100vh-70px)] overflow-y-auto">
 
-          <div className="px-4 py-4 space-y-3">
+          <div className="px-4 py-4 space-y-3 pb-24">
 
             <button
               onClick={() => scrollToSection('home')}
@@ -330,7 +334,7 @@ export default function Navbar({
 
 
             <button
-              onClick={onContactClick}
+              onClick={handleMobileContactClick}
               className="block w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors font-medium"
             >
               Contact Us
