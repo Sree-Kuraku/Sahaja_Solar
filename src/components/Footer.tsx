@@ -68,7 +68,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+            {/* Contact Info */}
           <div>
             <h4 className="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-[#22c55e] pl-2.5">
               Contact & Office
@@ -78,7 +78,7 @@ export default function Footer() {
                 <Phone size={18} className="mr-3 mt-0.5 text-[#22c55e] flex-shrink-0" />
                 <div>
                   <a href="tel:+918019604025" className="hover:text-white font-mono block">+91 8019604025</a>
-                  <a href="tel:+919490102030" className="hover:text-white font-mono block text-xs text-gray-500">+91 94901 02030</a>
+                  <a href="tel:+917416202494" className="hover:text-white font-mono block text-xs text-gray-400">+91 7416202494</a>
                 </div>
               </li>
               <li className="flex items-start text-gray-400">
@@ -87,7 +87,16 @@ export default function Footer() {
               </li>
               <li className="flex items-start text-gray-400">
                 <MapPin size={18} className="mr-3 mt-0.5 text-[#22c55e] flex-shrink-0" />
-                <span>#11-228/1, Machalipatnam Road opp-132kv s.s, Pamarru, Krishna District, AP - 521157, India</span>
+                <div className="space-y-2 text-xs text-gray-300 leading-relaxed">
+                  <div>
+                    <span className="text-[#22c55e] font-semibold block">Head Office:</span>
+                    <span>#11-228/1, Machalipatnam Road opp-132kv s.s, Pamarru, Krishna District, AP - 521157</span>
+                  </div>
+                  <div>
+                    <span className="text-[#22c55e] font-semibold block">Vijayawada Branch:</span>
+                    <span>West End Towers, Patamata, Vijayawada, Andhra Pradesh – 520010</span>
+                  </div>
+                </div>
               </li>
             </ul>
           </div>

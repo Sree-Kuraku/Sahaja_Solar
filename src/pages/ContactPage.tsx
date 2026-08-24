@@ -1,5 +1,5 @@
 import LeadForm from '../components/LeadForm';
-import { Phone, Mail, MapPin, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, MapPin, Building } from 'lucide-react';
 
 export default function ContactPage() {
   return (
@@ -18,11 +18,11 @@ export default function ContactPage() {
           </p>
         </div>
 
-        {/* Contact Info Cards */}
+        {/* Contact Info Cards Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           
           {/* Phone Numbers */}
-          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between">
+          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between hover:border-[#22c55e]/40 transition-colors">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 text-[#22c55e] flex items-center justify-center mx-auto mb-4">
                 <Phone className="w-6 h-6" />
@@ -30,18 +30,18 @@ export default function ContactPage() {
               <h3 className="text-sm font-bold text-white mb-1">Call Us Directly</h3>
               <p className="text-xs text-gray-400 mb-3">Mon - Sat: 9:00 AM - 7:00 PM</p>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <a href="tel:+918019604025" className="text-sm font-bold text-[#22c55e] hover:underline font-mono block">
                 +91 8019604025
               </a>
-              <a href="tel:+919490102030" className="text-sm font-bold text-[#22c55e] hover:underline font-mono block">
-                +91 94901 02030
+              <a href="tel:+917416202494" className="text-sm font-bold text-[#22c55e] hover:underline font-mono block">
+                +91 7416202494
               </a>
             </div>
           </div>
 
           {/* Email */}
-          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between">
+          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between hover:border-[#22c55e]/40 transition-colors">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 text-[#22c55e] flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-6 h-6" />
@@ -55,7 +55,7 @@ export default function ContactPage() {
           </div>
 
           {/* Head Office Address */}
-          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between">
+          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between hover:border-[#22c55e]/40 transition-colors">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 text-[#22c55e] flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-6 h-6" />
@@ -67,16 +67,16 @@ export default function ContactPage() {
             </p>
           </div>
 
-          {/* Free Site Survey */}
-          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between">
+          {/* Vijayawada Branch Office */}
+          <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 text-center flex flex-col justify-between hover:border-[#22c55e]/40 transition-colors">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/15 text-[#22c55e] flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="w-6 h-6" />
+                <Building className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-1">Free Site Survey</h3>
+              <h3 className="text-sm font-bold text-white mb-1">Vijayawada Branch</h3>
             </div>
-            <p className="text-xs text-gray-400">
-              Free shadow analysis & 3D rooftop CAD engineering proposal
+            <p className="text-xs text-gray-300 leading-relaxed">
+              West End Towers, Patamata, Vijayawada, Andhra Pradesh – 520010
             </p>
           </div>
 
