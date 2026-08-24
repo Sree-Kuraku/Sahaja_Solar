@@ -1,0 +1,21 @@
+{
+  "name": "Sahaja Solar - Solar Panel & Rooftop Solutions",
+  "short_name": "Sahaja Solar",
+  "description": "Leading solar installation and renewable energy solutions with PM Surya Ghar Yojana subsidies in Andhra Pradesh and Telangana.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d11",
+  "theme_color": "#22c55e",
+  "icons": [
+    {
+      "src": "/brandLogo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brandLogo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

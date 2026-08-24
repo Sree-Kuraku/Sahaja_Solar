@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage / Main Landing -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://sahajasolar.vercel.app/solar_hero_hd.jpg</image:loc>
+      <image:title>Sahaja Solar High-Efficiency Solar Panel Installation</image:title>
+      <image:caption>Sahaja Solar premium rooftop solar installation with 30-year warranty</image:caption>
+    </image:image>
+  </url>
+
+  <!-- About Sahaja Solar -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#about</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Solar Services -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#services</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Solar Subsidies & PM Surya Ghar Yojana -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#subsidies</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- Solar Products & Pricing -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#products</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Installation Gallery & Past Projects -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#gallery</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Why Choose Solar & ROI Calculator -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#why-solar</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Contact Us & Free Quote -->
+  <url>
+    <loc>https://sahajasolar.vercel.app/#contact</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+</urlset>

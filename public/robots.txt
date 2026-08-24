@@ -1,0 +1,8 @@
+# robots.txt for Sahaja Solar
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://sahajasolar.vercel.app/sitemap.xml
