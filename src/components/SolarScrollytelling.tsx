@@ -151,7 +151,7 @@ export default function SolarScrollytelling({
     };
   }, [totalFrames, imageFolderPath, imagePrefix, imageExtension]);
 
-  // 3. Instant First-Paint + Snappy 60/120fps Canvas Render Loop
+  // 3. Mobile-Responsive & Desktop Full-Bleed Canvas Render Engine
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -196,24 +196,38 @@ export default function SolarScrollytelling({
           ctx.save();
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+          // Clear background with dark slate matching 3D studio
+          ctx.fillStyle = "#0e131d";
+          ctx.fillRect(0, 0, displayWidth, displayHeight);
+
           const imgRatio = currentImg.naturalWidth / currentImg.naturalHeight;
           const canvasRatio = displayWidth / displayHeight;
+          const isMobile = displayWidth < 768;
 
           let drawWidth: number;
           let drawHeight: number;
           let offsetX: number;
           let offsetY: number;
 
-          if (imgRatio > canvasRatio) {
-            drawHeight = displayHeight;
-            drawWidth = drawHeight * imgRatio;
-            offsetX = (displayWidth - drawWidth) / 2;
-            offsetY = 0;
-          } else {
-            drawWidth = displayWidth;
+          if (isMobile) {
+            // Responsive mobile view: entire solar panel is 100% visible and centered in the upper-middle area
+            drawWidth = displayWidth * 0.94;
             drawHeight = drawWidth / imgRatio;
-            offsetX = 0;
-            offsetY = (displayHeight - drawHeight) / 2;
+            offsetX = (displayWidth - drawWidth) / 2;
+            offsetY = (displayHeight - drawHeight) * 0.40; // Positioned cleanly between top text and bottom logo
+          } else {
+            // Desktop Full-Bleed Cover
+            if (imgRatio > canvasRatio) {
+              drawHeight = displayHeight;
+              drawWidth = drawHeight * imgRatio;
+              offsetX = (displayWidth - drawWidth) / 2;
+              offsetY = 0;
+            } else {
+              drawWidth = displayWidth;
+              drawHeight = drawWidth / imgRatio;
+              offsetX = 0;
+              offsetY = (displayHeight - drawHeight) / 2;
+            }
           }
 
           ctx.imageSmoothingEnabled = true;
@@ -247,7 +261,7 @@ export default function SolarScrollytelling({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[220vh] select-none"
+      className="relative w-full h-[220vh] bg-[#0e131d] select-none"
     >
       {/* 1. Preloader */}
       <AnimatePresence>
@@ -285,59 +299,64 @@ export default function SolarScrollytelling({
         )}
       </AnimatePresence>
 
-      {/* 2. Sticky Fullscreen Viewport (100% Single Frame Edge-to-Edge) */}
-      <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center">
-        {/* The Full-Bleed Canvas */}
+      {/* 2. Sticky Fullscreen Viewport */}
+      <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center bg-[#0e131d]">
+        {/* The Canvas */}
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-cover block relative z-0 filter contrast-[105%] brightness-[101%] saturate-[106%]"
+          className="w-full h-full block relative z-0 filter contrast-[105%] brightness-[101%] saturate-[106%]"
         />
 
-        {/* 3. Original Hero Text & Logo Overlay (Fades out smoothly on scroll) */}
+        {/* 3. Hero Text & Logo Overlay (Fades out smoothly on scroll) */}
         <motion.div
           style={{
             opacity: heroOpacity,
             scale: heroScale,
             y: heroY,
           }}
-          className="pointer-events-none absolute inset-0 z-20 flex min-h-screen w-full items-center"
+          className="pointer-events-none absolute inset-0 z-20 flex h-full w-full flex-col justify-between"
         >
-          <div className="mx-auto flex w-full max-w-7xl flex-col justify-between px-6 sm:px-12 md:flex-row md:items-center md:gap-10">
-            {/* HERO TEXT (Left Side) */}
-            <div className="pt-[88px] sm:pt-[95px] md:pt-0">
-              <h1 className="text-[38px] font-bold leading-[1.04] tracking-tight text-white sm:text-[44px] md:text-6xl lg:text-7xl">
+          <div className="mx-auto flex h-full w-full max-w-7xl flex-col justify-between px-5 sm:px-10 md:flex-row md:items-center md:gap-10">
+            
+            {/* HERO TEXT (Top on mobile, Left on desktop) */}
+            <div className="pt-20 sm:pt-24 md:pt-0">
+              <h1 className="text-[32px] font-bold leading-[1.08] tracking-tight text-white sm:text-[44px] md:text-6xl lg:text-7xl">
                 Use solar for a{" "}
                 <span className="text-[#22c55e]">
                   Better future
                 </span>
               </h1>
 
-              <p className="mt-5 max-w-[440px] text-[15px] leading-[1.65] text-gray-200 sm:text-base md:text-lg">
+              <p className="mt-3 max-w-[440px] text-[13px] leading-[1.6] text-gray-200 sm:text-base md:text-lg">
                 Transform your energy consumption with sustainable solar solutions.
                 Save money while contributing to a cleaner, greener planet.
               </p>
             </div>
 
-            {/* SAHAJA SOLAR LOGO CARD (Right Side) */}
-            <div className="relative z-20 mt-auto mb-[74px] flex justify-center md:mt-0 md:mb-0 md:justify-end">
-              <div className="w-[72%] max-w-[300px] rounded-[26px] border border-white/20 bg-white/[0.10] p-4 shadow-2xl backdrop-blur-md sm:w-[70%] sm:max-w-[330px] sm:p-6 md:w-full md:max-w-md md:rounded-3xl md:p-10">
-                <div className="flex h-[155px] items-center justify-center sm:h-[190px] md:h-[300px]">
+            {/* SAHAJA SOLAR LOGO CARD:
+                - On Mobile: Sits nicely in the lower open area (red circled zone) below the solar panel
+                - On Desktop: Sits on the right side as a sleek frosted card
+            */}
+            <div className="relative z-20 pb-16 sm:pb-20 md:pb-0 flex justify-center md:justify-end">
+              <div className="w-[62%] max-w-[220px] rounded-[20px] border border-white/20 bg-white/[0.12] p-3.5 shadow-2xl backdrop-blur-md sm:w-[68%] sm:max-w-[280px] sm:p-5 md:w-full md:max-w-md md:rounded-3xl md:p-10">
+                <div className="flex h-[95px] items-center justify-center sm:h-[140px] md:h-[300px]">
                   <img
                     src={logoSrc}
                     alt="Sahaja Solar"
                     draggable={false}
-                    className="block max-h-full max-w-[88%] object-contain"
+                    className="block max-h-full max-w-[85%] object-contain"
                   />
                 </div>
               </div>
             </div>
+
           </div>
         </motion.div>
 
         {/* 4. SCROLL TO EXPLORE Indicator */}
         <motion.div
           style={{ opacity: scrollTextOpacity }}
-          className="pointer-events-none absolute bottom-5 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.28em] text-white/65 sm:bottom-6 sm:text-xs"
+          className="pointer-events-none absolute bottom-4 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.28em] text-white/60 sm:bottom-6 sm:text-xs"
         >
           SCROLL TO EXPLORE
         </motion.div>

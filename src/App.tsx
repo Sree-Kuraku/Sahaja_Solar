@@ -1,27 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
-import HeroSection from './components/HeroSection';
-import AboutSection from './components/AboutSection';
-import WhySolarSection from './components/WhySolarSection';
-import ServicesSection from './components/ServicesSection';
-import SubsidiesSection from './components/SubsidiesSection';
-import Gallery from "./components/Gallery";
-import SolarModules from "./components/SolarModules";
-import SolarStreetLights from "./components/SolarStreetLights";
-import SolarWaterPumps from "./components/SolarWaterPumps";
-import SolarOffGrid from "./components/SolarOffGrid";
-import SolarInverters from "./components/SolarInverters";
-import SolarBatteries from "./components/SolarBatteries";
-import SolarWaterHeaters from "./components/SolarWaterHeaters";
-import LeadForm from './components/LeadForm';
 import Footer from './components/Footer';
+import WhatsAppButton from './components/WhatsAppButton';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
-import WhatsAppButton from "./components/WhatsAppButton";
 
+// Pages
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import WhySolarPage from './pages/WhySolarPage';
+import ServicesPage from './pages/ServicesPage';
+import GalleryPage from './pages/GalleryPage';
+import SubsidiesPage from './pages/SubsidiesPage';
+import ProductsPage from './pages/ProductsPage';
+import ContactPage from './pages/ContactPage';
 
-function App() {
+// Scroll to top on route change helper
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pathname]);
+
+  return null;
+}
+
+function MainLayout() {
   const { user, loading } = useAuth();
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 
@@ -34,8 +41,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-[#0b0d11] flex items-center justify-center">
+        <div className="text-white text-xl font-mono">Loading Sahaja Solar...</div>
       </div>
     );
   }
@@ -45,43 +52,35 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] relative">
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(https://images.pexels.com/photos/371900/pexels-photo-371900.jpeg?auto=compress&cs=tinysrgb&w=1920)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <div className="absolute inset-0 bg-[#0f172a]/85" />
-      </div>
+    <div className="min-h-screen bg-[#0b0d11] relative text-white selection:bg-[#22c55e] selection:text-black">
+      <ScrollToTop />
 
-      <div className="relative z-10">
-        <Navbar
-          onAdminClick={() => setShowAdminLogin(true)}
-          onContactClick={scrollToContact}
-        />
-        <HeroSection onContactClick={scrollToContact} />
-        <AboutSection />
-        <WhySolarSection />
-        <ServicesSection />
-        <SubsidiesSection />
-         <Gallery />
-        <SolarModules />
-<SolarStreetLights />
-<SolarWaterPumps />
-<SolarOffGrid />
-<SolarInverters />
-<SolarBatteries />
-<SolarWaterHeaters />
-        <LeadForm />
-        <Footer />
-        <WhatsAppButton />
-        
-      </div>
+      {/* Global Navbar */}
+      <Navbar
+        onAdminClick={() => setShowAdminLogin(true)}
+        onContactClick={scrollToContact}
+      />
 
+      {/* Multi-Page Routes */}
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage onContactClick={scrollToContact} />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/why-solar" element={<WhySolarPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/subsidies" element={<SubsidiesPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<HomePage onContactClick={scrollToContact} />} />
+        </Routes>
+      </main>
+
+      {/* Global Footer & WhatsApp Button */}
+      <Footer />
+      <WhatsAppButton />
+
+      {/* Admin Login Modal */}
       {showAdminLogin && (
         <AdminLogin onClose={() => setShowAdminLogin(false)} />
       )}
@@ -89,4 +88,10 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <MainLayout />
+    </Router>
+  );
+}
