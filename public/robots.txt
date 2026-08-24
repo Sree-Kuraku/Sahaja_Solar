@@ -4,5 +4,6 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-# Sitemaps
+# Sitemaps for Official Custom Domain
+Sitemap: https://www.sahajasolar.com/sitemap.xml
 Sitemap: https://sahajasolar.vercel.app/sitemap.xml
