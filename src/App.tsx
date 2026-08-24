@@ -63,7 +63,7 @@ function App() {
           onAdminClick={() => setShowAdminLogin(true)}
           onContactClick={scrollToContact}
         />
-        <HeroSection />
+        <HeroSection onContactClick={scrollToContact} />
         <AboutSection />
         <WhySolarSection />
         <ServicesSection />
