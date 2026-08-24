@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
    ============================================================ */
 
 const panelFrames = Object.entries(
-  import.meta.glob("../assets/Panel Animation/ezgif-frame-*.jpg", {
+  import.meta.glob("../assets/Panel Animation/ezgif-frame-*.webp", {
     eager: true,
     import: "default",
     query: "?url",
@@ -14,11 +14,11 @@ const panelFrames = Object.entries(
 )
   .sort(([a], [b]) => {
     const frameA = Number(
-      a.match(/ezgif-frame-(\d+)\.jpg/)?.[1] ?? 0
+      a.match(/ezgif-frame-(\d+)\.webp/)?.[1] ?? 0
     );
 
     const frameB = Number(
-      b.match(/ezgif-frame-(\d+)\.jpg/)?.[1] ?? 0
+      b.match(/ezgif-frame-(\d+)\.webp/)?.[1] ?? 0
     );
 
     return frameA - frameB;
