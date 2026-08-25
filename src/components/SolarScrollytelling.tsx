@@ -20,10 +20,9 @@ export default function SolarScrollytelling({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Sequence and Preloader States
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
-  const [firstFrame, setFirstFrame] = useState<HTMLImageElement | null>(null);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+  // References for zero-latency frame access in 60fps loop
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const [firstFrameLoaded, setFirstFrameLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
   const [frameCount, setFrameCount] = useState(totalFrames);
 
@@ -33,31 +32,30 @@ export default function SolarScrollytelling({
   const lastDrawnFrameRef = useRef(-1);
   const animationFrameIdRef = useRef<number | null>(null);
 
-  // 1. Scroll-linked tracking via Framer Motion (Optimized 220vh track for fast, snappy pacing)
+  // 1. Scroll-linked tracking via Framer Motion (220vh track)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Map scroll progress (0 -> 1) dynamically across all detected frames
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const rawIndex = Math.min(
-      frameCount - 1,
-      Math.max(0, Math.floor(latest * (frameCount - 1)))
-    );
-    targetFrameRef.current = rawIndex;
-  });
-
-  // Snappy fade out for Hero text, logo card, and "SCROLL TO EXPLORE" during initial scroll (0% to 15%)
+  // Snappy fade out for Hero text, logo card, and "SCROLL TO EXPLORE" during initial scroll (0% to 20%)
   const heroOpacity = useTransform(scrollYProgress, [0, 0.12, 0.20], [1, 0.5, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.20], [1, 0.94]);
   const heroY = useTransform(scrollYProgress, [0, 0.20], [0, -30]);
   const scrollTextOpacity = useTransform(scrollYProgress, [0, 0.10], [1, 0]);
 
-  // 2. Instant First-Frame Loading + Fast Stream Preload for Remaining Frames
+  // Map scroll progress (0 -> 1) dynamically across all detected frames
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const rawIndex = Math.min(
+      frameCount - 1,
+      Math.max(0, Math.floor(latest * frameCount))
+    );
+    targetFrameRef.current = rawIndex;
+  });
+
+  // 2. Instant First-Frame Loading + Progressive Background Streaming for Remaining Frames
   useEffect(() => {
     let isMounted = true;
-    const loadedImgs: HTMLImageElement[] = [];
     let loadedCount = 0;
 
     const padZero = (num: number, size = 3) => {
@@ -83,7 +81,6 @@ export default function SolarScrollytelling({
     const activeCount = globUrls.length > 0 ? globUrls.length : totalFrames;
     setFrameCount(activeCount);
 
-    // Prioritize frame 1 for immediate render
     const loadSingleFrame = (i: number) => {
       const img = new Image();
       const frameString = padZero(i);
@@ -105,26 +102,21 @@ export default function SolarScrollytelling({
           // Fallback
         }
 
-        loadedImgs[frameIndex] = img;
+        // Store directly into imagesRef for instantaneous 60fps availability
+        imagesRef.current[frameIndex] = img;
         loadedCount++;
 
-        // Instantly display Frame 1 as soon as it loads so the hero opens immediately
+        // Trigger immediate hero display as soon as Frame 1 is ready
         if (frameIndex === 0) {
-          setFirstFrame(img);
-          setImages([...loadedImgs]);
-          // Instant opening: dismiss preloader once frame 1 is ready and decoded!
-          setImagesLoaded(true);
+          setFirstFrameLoaded(true);
         }
 
         setLoadProgress(Math.round((loadedCount / activeCount) * 100));
-
-        if (loadedCount === activeCount) {
-          setImages([...loadedImgs]);
-        }
       };
 
       img.onerror = () => {
         if (!isMounted) return;
+        // Fallback to public folder path
         const altSrc = `/Panel Animation-2/${imagePrefix}${frameString}.${imageExtension}`;
         const retryImg = new Image();
         retryImg.src = altSrc;
@@ -133,17 +125,12 @@ export default function SolarScrollytelling({
           try {
             if (retryImg.decode) await retryImg.decode();
           } catch {}
-          loadedImgs[frameIndex] = retryImg;
+          imagesRef.current[frameIndex] = retryImg;
           if (frameIndex === 0) {
-            setFirstFrame(retryImg);
-            setImages([...loadedImgs]);
-            setImagesLoaded(true);
+            setFirstFrameLoaded(true);
           }
           loadedCount++;
           setLoadProgress(Math.round((loadedCount / activeCount) * 100));
-          if (loadedCount === activeCount) {
-            setImages([...loadedImgs]);
-          }
         };
       };
     };
@@ -173,16 +160,24 @@ export default function SolarScrollytelling({
     const render = () => {
       if (!isRunning) return;
 
-      // Snappy physics damping (LERP factor 0.24 for instant response without hanging)
+      // Real-time scroll progress fallback to guarantee immediate sync
+      const progress = scrollYProgress.get();
+      const currentTarget = Math.min(
+        frameCount - 1,
+        Math.max(0, Math.floor(progress * frameCount))
+      );
+      targetFrameRef.current = currentTarget;
+
+      // Snappy physics damping (LERP factor 0.30 for instant snappy response)
       const diff = targetFrameRef.current - currentFrameRef.current;
-      currentFrameRef.current += diff * 0.24;
+      currentFrameRef.current += diff * 0.30;
 
       const activeIndex = Math.min(
         frameCount - 1,
         Math.max(0, Math.round(currentFrameRef.current))
       );
 
-      const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 1.75) : 1;
+      const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
       const displayWidth = canvas.clientWidth;
       const displayHeight = canvas.clientHeight;
 
@@ -190,31 +185,38 @@ export default function SolarScrollytelling({
       const targetHeight = Math.round(displayHeight * dpr);
 
       const sizeChanged = canvas.width !== targetWidth || canvas.height !== targetHeight;
-      if (sizeChanged) {
+      if (sizeChanged && targetWidth > 0 && targetHeight > 0) {
         canvas.width = targetWidth;
         canvas.height = targetHeight;
       }
 
-      // Find closest loaded frame to activeIndex if current frame is not yet fully loaded
-      let currentImg = images[activeIndex];
-      if (!currentImg || !currentImg.complete) {
+      // Read from imagesRef (always up-to-date across all 50 frames without React state delay)
+      const allImgs = imagesRef.current;
+      let currentImg = allImgs[activeIndex];
+
+      // If active frame isn't loaded yet, find closest loaded frame
+      if (!currentImg || !currentImg.complete || currentImg.naturalWidth === 0) {
         for (let offset = 1; offset < frameCount; offset++) {
-          if (activeIndex - offset >= 0 && images[activeIndex - offset]?.complete) {
-            currentImg = images[activeIndex - offset];
+          const prev = allImgs[activeIndex - offset];
+          if (prev && prev.complete && prev.naturalWidth > 0) {
+            currentImg = prev;
             break;
           }
-          if (activeIndex + offset < frameCount && images[activeIndex + offset]?.complete) {
-            currentImg = images[activeIndex + offset];
+          const next = allImgs[activeIndex + offset];
+          if (next && next.complete && next.naturalWidth > 0) {
+            currentImg = next;
             break;
           }
         }
       }
-      if (!currentImg || !currentImg.complete) {
-        currentImg = firstFrame || images[0];
+
+      // Ultimate fallback to frame 0
+      if (!currentImg || !currentImg.complete || currentImg.naturalWidth === 0) {
+        currentImg = allImgs[0];
       }
 
       if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
-        // Redraw when frame changes or on size change or on first frame mount
+        // Redraw when frame changes or on resize or on first mount
         if (sizeChanged || lastDrawnFrameRef.current !== activeIndex || lastDrawnFrameRef.current === -1) {
           lastDrawnFrameRef.current = activeIndex;
 
@@ -267,7 +269,7 @@ export default function SolarScrollytelling({
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
-  }, [images, firstFrame, frameCount]);
+  }, [frameCount, scrollYProgress]);
 
   return (
     <div
@@ -276,7 +278,7 @@ export default function SolarScrollytelling({
     >
       {/* 1. Preloader */}
       <AnimatePresence>
-        {!imagesLoaded && (
+        {!firstFrameLoaded && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }}
