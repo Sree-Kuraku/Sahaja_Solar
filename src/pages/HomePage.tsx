@@ -17,8 +17,8 @@ export default function HomePage({ onContactClick }: HomePageProps) {
       {/* 2. About Us (Expanded) */}
       <AboutSection />
 
-      {/* 3. Our Recent Projects */}
-      <Gallery />
+      {/* 3. Our Recent Projects (Featured 4 + View All link) */}
+      <Gallery limit={4} showViewAllButton={true} />
 
       {/* 4. Solar Savings & Subsidy Calculator */}
       <SolarCalculator onQuoteClick={onContactClick} />
