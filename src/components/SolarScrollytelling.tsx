@@ -14,7 +14,7 @@ export default function SolarScrollytelling({
   totalFrames = 50,
   imageFolderPath = "/Panel Animation-2",
   imagePrefix = "ezgif-frame-",
-  imageExtension = "png",
+  imageExtension = "webp",
   logoSrc = "/brandLogo.png",
 }: SolarScrollytellingProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ export default function SolarScrollytelling({
     let globUrls: string[] = [];
     try {
       // @ts-ignore
-      const globFiles = import.meta.glob("/src/assets/Panel Animation-2/*.{png,jpg,jpeg,webp}", {
+      const globFiles = import.meta.glob("/src/assets/Panel Animation-2/*.webp", {
         eager: true,
         import: "default",
       });
