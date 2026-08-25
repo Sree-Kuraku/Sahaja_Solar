@@ -11,8 +11,8 @@ interface SolarScrollytellingProps {
 }
 
 export default function SolarScrollytelling({
-  totalFrames = 40,
-  imageFolderPath = "/Panel Animation-1",
+  totalFrames = 50,
+  imageFolderPath = "/Panel Animation-2",
   imagePrefix = "ezgif-frame-",
   imageExtension = "png",
   logoSrc = "/brandLogo.png",
@@ -54,7 +54,7 @@ export default function SolarScrollytelling({
   const heroY = useTransform(scrollYProgress, [0, 0.20], [0, -30]);
   const scrollTextOpacity = useTransform(scrollYProgress, [0, 0.10], [1, 0]);
 
-  // 2. Instant First-Frame Loading + Background Preload for Remaining Frames
+  // 2. Instant First-Frame Loading + Fast Stream Preload for Remaining Frames
   useEffect(() => {
     let isMounted = true;
     const loadedImgs: HTMLImageElement[] = [];
@@ -69,7 +69,7 @@ export default function SolarScrollytelling({
     let globUrls: string[] = [];
     try {
       // @ts-ignore
-      const globFiles = import.meta.glob("/src/assets/Panel Animation-1/*.{png,jpg,jpeg,webp}", {
+      const globFiles = import.meta.glob("/src/assets/Panel Animation-2/*.{png,jpg,jpeg,webp}", {
         eager: true,
         import: "default",
       });
@@ -83,7 +83,8 @@ export default function SolarScrollytelling({
     const activeCount = globUrls.length > 0 ? globUrls.length : totalFrames;
     setFrameCount(activeCount);
 
-    for (let i = 1; i <= activeCount; i++) {
+    // Prioritize frame 1 for immediate render
+    const loadSingleFrame = (i: number) => {
       const img = new Image();
       const frameString = padZero(i);
       const frameIndex = i - 1;
@@ -107,23 +108,24 @@ export default function SolarScrollytelling({
         loadedImgs[frameIndex] = img;
         loadedCount++;
 
-        // Instantly display Frame 1 as soon as it loads so the hero is NEVER black
+        // Instantly display Frame 1 as soon as it loads so the hero opens immediately
         if (frameIndex === 0) {
           setFirstFrame(img);
           setImages([...loadedImgs]);
+          // Instant opening: dismiss preloader once frame 1 is ready and decoded!
+          setImagesLoaded(true);
         }
 
         setLoadProgress(Math.round((loadedCount / activeCount) * 100));
 
         if (loadedCount === activeCount) {
           setImages([...loadedImgs]);
-          setImagesLoaded(true);
         }
       };
 
       img.onerror = () => {
         if (!isMounted) return;
-        const altSrc = `/panel-animation-1/${imagePrefix}${frameString}.${imageExtension}`;
+        const altSrc = `/Panel Animation-2/${imagePrefix}${frameString}.${imageExtension}`;
         const retryImg = new Image();
         retryImg.src = altSrc;
         retryImg.onload = async () => {
@@ -135,15 +137,23 @@ export default function SolarScrollytelling({
           if (frameIndex === 0) {
             setFirstFrame(retryImg);
             setImages([...loadedImgs]);
+            setImagesLoaded(true);
           }
           loadedCount++;
           setLoadProgress(Math.round((loadedCount / activeCount) * 100));
           if (loadedCount === activeCount) {
             setImages([...loadedImgs]);
-            setImagesLoaded(true);
           }
         };
       };
+    };
+
+    // Load Frame 1 first for immediate paint
+    loadSingleFrame(1);
+
+    // Load remaining frames in parallel
+    for (let i = 2; i <= activeCount; i++) {
+      loadSingleFrame(i);
     }
 
     return () => {
@@ -151,7 +161,7 @@ export default function SolarScrollytelling({
     };
   }, [totalFrames, imageFolderPath, imagePrefix, imageExtension]);
 
-  // 3. Instant First-Paint + Snappy 60/120fps Full-Bleed Canvas Render Loop (Restored Exact Previous Desktop Setup)
+  // 3. Instant First-Paint + Snappy 60/120fps Full-Bleed Canvas Render Loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -185,8 +195,23 @@ export default function SolarScrollytelling({
         canvas.height = targetHeight;
       }
 
-      // Always fallback to firstFrame or images[0] so the hero is NEVER blank/black on initial load!
-      const currentImg = images[activeIndex] || images[0] || firstFrame;
+      // Find closest loaded frame to activeIndex if current frame is not yet fully loaded
+      let currentImg = images[activeIndex];
+      if (!currentImg || !currentImg.complete) {
+        for (let offset = 1; offset < frameCount; offset++) {
+          if (activeIndex - offset >= 0 && images[activeIndex - offset]?.complete) {
+            currentImg = images[activeIndex - offset];
+            break;
+          }
+          if (activeIndex + offset < frameCount && images[activeIndex + offset]?.complete) {
+            currentImg = images[activeIndex + offset];
+            break;
+          }
+        }
+      }
+      if (!currentImg || !currentImg.complete) {
+        currentImg = firstFrame || images[0];
+      }
 
       if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
         // Redraw when frame changes or on size change or on first frame mount
